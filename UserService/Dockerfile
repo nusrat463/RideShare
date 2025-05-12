@@ -1,3 +1,9 @@
+# Use Maven to build the JAR
+FROM maven:3.8.5-openjdk-8-slim AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
 # Use an official OpenJDK runtime as a parent image
 FROM openjdk:8-jdk-slim
 

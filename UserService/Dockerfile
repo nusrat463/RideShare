@@ -5,16 +5,16 @@ FROM maven:3.8.5-openjdk-8-slim AS build
 WORKDIR /app
 
 # Copy the Maven pom.xml file to the container
-COPY UserService/pom.xml ./
+COPY UserService/pom.xml ./UserService/pom.xml
 
 # Download the Maven dependencies (this step caches dependencies for faster builds)
-RUN mvn dependency:go-offline
+RUN mvn dependency:go-offline -f UserService/pom.xml
 
-# Now copy the entire content of UserService project into the container
+# Now copy the entire content of the UserService project into the container
 COPY UserService/ ./UserService/
 
 # Build the JAR file (skip tests for faster build)
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -f UserService/pom.xml
 
 # ---------- Stage 2: Run the application ----------
 FROM openjdk:8-jdk-slim

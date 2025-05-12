@@ -16,14 +16,11 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: ride_sharing
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: root  # Set the root password to "root"
+          MYSQL_DATABASE: ride_sharing  # Ensure the "ride_sharing" database is created
         ports:
-          - 3306:3306  # Expose port 3306 for MySQL to connect to
-        options: --health-cmd="mysqladmin ping --silent"  # Health check to ensure MySQL is ready
-
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent"
 
     steps:
       - name: Checkout code
@@ -34,6 +31,14 @@ jobs:
         with:
           java-version: '8'
           distribution: 'temurin'
+
+      # Wait for MySQL to be ready before proceeding
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysql -h 127.0.0.1 -u root -proot -e "SHOW DATABASES;"; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
 
       - name: Build UserService JAR
         run: mvn clean package -f ./UserService/pom.xml --no-transfer-progress

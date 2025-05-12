@@ -12,6 +12,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: ride_sharing
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+        ports:
+          - 3306:3306  # Expose port 3306 for MySQL to connect to
+        options: --health-cmd="mysqladmin ping --silent"  # Health check to ensure MySQL is ready
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -21,7 +34,7 @@ jobs:
         with:
           java-version: '8'
           distribution: 'temurin'
-          
+
       - name: Build UserService JAR
         run: mvn clean package -f ./UserService/pom.xml --no-transfer-progress
 

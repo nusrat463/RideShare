@@ -2,8 +2,7 @@
 FROM maven:3.8.4-openjdk-11-slim AS build
 
 # Copy only the necessary files (pom.xml and source code)
-COPY ./pom.xml /pom.xml
-COPY ./src /src
+COPY . .
 
 # Run Maven to build the project
 RUN mvn clean package -DskipTests

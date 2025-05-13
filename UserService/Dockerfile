@@ -3,6 +3,7 @@ FROM maven:3.8.4-openjdk-11-slim AS build
 
 WORKDIR /app
 # Copy only the necessary files (pom.xml and source code)
+COPY . .
 COPY ./pom.xml ./
 
 # Run Maven to build the project

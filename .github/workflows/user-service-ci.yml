@@ -1,59 +1,59 @@
-name: Build and Deploy UserService
-
-on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'UserService/**'
-      - '.github/workflows/user-service-ci.yml'
-  pull_request:
-    branches:
-      - master
-    paths:
-      - 'UserService/**'
-      - '.github/workflows/user-service-ci.yml'
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root  # Set the root password to "root"
-          MYSQL_DATABASE: ride_sharing  # Ensure the "ride_sharing" database is created
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping --silent"
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-
-      # Wait for MySQL to be ready before proceeding
-      - name: Wait for MySQL to be ready
-        run: |
-          until mysql -h 127.0.0.1 -u root -proot -e "SHOW DATABASES;"; do
-            echo "Waiting for MySQL..."
-            sleep 5
-          done
-
-      - name: Build UserService JAR
-        run: mvn clean package -f ./UserService/pom.xml --no-transfer-progress
-
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Build Docker image for UserService
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service:${{ github.sha }} ./UserService
-
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/user-service:${{ github.sha }}
+#name: Build and Deploy UserService
+#
+#on:
+#  push:
+#    branches:
+#      - master
+#    paths:
+#      - 'UserService/**'
+#      - '.github/workflows/user-service-ci.yml'
+#  pull_request:
+#    branches:
+#      - master
+#    paths:
+#      - 'UserService/**'
+#      - '.github/workflows/user-service-ci.yml'
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#
+#    services:
+#      mysql:
+#        image: mysql:8.0
+#        env:
+#          MYSQL_ROOT_PASSWORD: root  # Set the root password to "root"
+#          MYSQL_DATABASE: ride_sharing  # Ensure the "ride_sharing" database is created
+#        ports:
+#          - 3306:3306
+#        options: --health-cmd="mysqladmin ping --silent"
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#
+#      - name: Set up JDK
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '8'
+#          distribution: 'temurin'
+#
+#      # Wait for MySQL to be ready before proceeding
+#      - name: Wait for MySQL to be ready
+#        run: |
+#          until mysql -h 127.0.0.1 -u root -proot -e "SHOW DATABASES;"; do
+#            echo "Waiting for MySQL..."
+#            sleep 5
+#          done
+#
+#      - name: Build UserService JAR
+#        run: mvn clean package -f ./UserService/pom.xml --no-transfer-progress
+#
+#      - name: Log in to Docker Hub
+#        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+#
+#      - name: Build Docker image for UserService
+#        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service:${{ github.sha }} ./UserService
+#
+#      - name: Push Docker image
+#        run: docker push ${{ secrets.DOCKER_USERNAME }}/user-service:${{ github.sha }}

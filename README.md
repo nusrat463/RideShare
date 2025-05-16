@@ -1,6 +1,6 @@
 # 🚗 RideShare Microservices Backend
 
-RideShare is a Spring Boot-based backend application split into two microservices: `User Service` and `Rider Service`. It uses **RabbitMQ** for asynchronous communication 
+RideShare is a Spring Boot-based backend application follows a monorepo microservice architecture: `User Service` and `Rider Service`. It uses **RabbitMQ** for asynchronous communication 
 between services and includes a simple CI/CD pipeline using **Docker**, **GitHub Actions**, and deployment to a free cloud platform.
 
 ---

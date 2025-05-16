@@ -1,26 +1,36 @@
 package com.example.RiderService.model;
-
-import org.springframework.scheduling.annotation.EnableScheduling;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class Ride {
 
     @Id
-    private String id;
+    private Long id;
     private String userId;
-    private String pickupLocation;
-    private String dropoffLocation;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "pickup_latitude")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "pickup_longitude"))
+    })
+    private Location pickupLocation;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "dropoff_latitude")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "dropoff_longitude"))
+    })
+    private Location dropoffLocation;
     private String status;
     private String riderId;
+    private LocalDateTime createdAt;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -32,19 +42,19 @@ public class Ride {
         this.userId = userId;
     }
 
-    public String getPickupLocation() {
+    public Location  getPickupLocation() {
         return pickupLocation;
     }
 
-    public void setPickupLocation(String pickupLocation) {
+    public void setPickupLocation(Location  pickupLocation) {
         this.pickupLocation = pickupLocation;
     }
 
-    public String getDropoffLocation() {
+    public Location  getDropoffLocation() {
         return dropoffLocation;
     }
 
-    public void setDropoffLocation(String dropoffLocation) {
+    public void setDropoffLocation(Location  dropoffLocation) {
         this.dropoffLocation = dropoffLocation;
     }
 
@@ -63,4 +73,8 @@ public class Ride {
     public void setRiderId(String riderId) {
         this.riderId = riderId;
     }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

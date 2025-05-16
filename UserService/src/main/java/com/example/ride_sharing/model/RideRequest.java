@@ -1,9 +1,10 @@
 package com.example.ride_sharing.model;
 
+
 public class RideRequest {
     private String userId;
-    private String pickupLocation;
-    private String dropoffLocation;
+    private Location pickupLocation;
+    private Location dropoffLocation;
 
     public String getUserId() {
         return userId;
@@ -13,19 +14,20 @@ public class RideRequest {
         this.userId = userId;
     }
 
-    public String getPickupLocation() {
+    public Location getPickupLocation() {
         return pickupLocation;
     }
 
-    public void setPickupLocation(String pickupLocation) {
+    public void setPickupLocation(Location pickupLocation) {
         this.pickupLocation = pickupLocation;
     }
 
-    public String getDropoffLocation() {
+    public Location getDropoffLocation() {
         return dropoffLocation;
     }
 
-    public void setDropoffLocation(String dropoffLocation) {
+    public void setDropoffLocation(Location dropoffLocation) {
         this.dropoffLocation = dropoffLocation;
     }
 }
+

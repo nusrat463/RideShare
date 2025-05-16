@@ -8,6 +8,9 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 public class RabbitMQConfig {
 
@@ -30,4 +33,30 @@ public class RabbitMQConfig {
     public Jackson2JsonMessageConverter converter() {
         return new Jackson2JsonMessageConverter();
     }
+
+    @Bean
+    public Queue retryDelayedQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", "ride.exchange");
+        args.put("x-dead-letter-routing-key", "ride.match.retry");
+        args.put("x-message-ttl", 10000); // 10 seconds
+        return new Queue("ride.match.retry.delayed", true, false, false, args);
+    }
+
+    @Bean
+    public Queue retryQueue() {
+        return new Queue("ride.match.retry.queue");
+    }
+
+    @Bean
+    public Binding retryDelayedBinding(Queue retryDelayedQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(retryDelayedQueue).to(exchange).with("ride.match.retry.delayed");
+    }
+
+    @Bean
+    public Binding retryBinding(Queue retryQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(retryQueue).to(exchange).with("ride.match.retry");
+    }
+
+
 }

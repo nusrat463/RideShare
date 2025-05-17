@@ -43,10 +43,6 @@ public class RabbitMQConfig {
         return new Queue("ride.match.retry.delayed", true, false, false, args);
     }
 
-    @Bean
-    public Queue retryQueue() {
-        return new Queue("ride.match.retry.queue");
-    }
 
     @Bean
     public Binding retryDelayedBinding(Queue retryDelayedQueue, DirectExchange exchange) {
@@ -56,6 +52,24 @@ public class RabbitMQConfig {
     @Bean
     public Binding retryBinding(Queue retryQueue, DirectExchange exchange) {
         return BindingBuilder.bind(retryQueue).to(exchange).with("ride.match.retry");
+    }
+
+    @Bean
+    public Queue deadLetterQueue() {
+        return new Queue("ride.match.dlq", true);
+    }
+
+    @Bean
+    public Queue retryQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", "ride.exchange");
+        args.put("x-dead-letter-routing-key", "ride.match.dlq");
+        return new Queue("ride.match.retry.queue", true, false, false, args);
+    }
+
+    @Bean
+    public Binding dlqBinding() {
+        return BindingBuilder.bind(deadLetterQueue()).to(exchange()).with("ride.match.dlq");
     }
 
 

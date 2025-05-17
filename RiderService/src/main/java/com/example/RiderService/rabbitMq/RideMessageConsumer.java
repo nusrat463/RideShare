@@ -4,6 +4,8 @@ import com.example.RiderService.model.RideAssignedEvent;
 import com.example.RiderService.model.Rider;
 import com.example.RiderService.repository.RideRepository;
 import com.example.RiderService.repository.RiderRepository;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +90,33 @@ public class RideMessageConsumer {
     }
 
     @RabbitListener(queues = "ride.match.retry.queue")
-    public void retryMatching(Long rideId) {
-        matchRiderToRide(rideId);
+    public void retryMatching(Message message) {
+        Long rideId = Long.parseLong(new String(message.getBody()));
+        Integer retryCount = (Integer) message.getMessageProperties().getHeaders()
+                .getOrDefault("x-retry-count", 0);
+
+        if (retryCount >= 3) {
+            System.out.println("Max retry reached for Ride ID: " + rideId + ". Sending to DLQ.");
+            rabbitTemplate.convertAndSend("ride.exchange", "ride.match.dlq", rideId);
+        } else {
+            System.out.println("Retrying ride match for Ride ID: " + rideId + ", attempt #" + (retryCount + 1));
+
+            MessageProperties props = new MessageProperties();
+            props.setHeader("x-retry-count", retryCount + 1);
+
+            Message newMessage =
+                    new Message(String.valueOf(rideId).getBytes(), props);
+
+            // Send to retry delayed queue again for next retry
+            rabbitTemplate.send("ride.exchange", "ride.match.retry.delayed", newMessage);
+        }
     }
+
+    @RabbitListener(queues = "ride.match.dlq")
+    public void handleFailedMatching(Long rideId) {
+        System.err.println("🚨 Ride match permanently failed for ride ID: " + rideId);
+        // can notify admin or save to DB
+    }
+
+
 }

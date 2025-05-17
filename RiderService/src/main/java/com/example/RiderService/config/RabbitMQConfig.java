@@ -20,6 +20,11 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue rideQueue() {
+        return new Queue("rideQueue", false);
+    }
+
+    @Bean
     public DirectExchange exchange() {
         return new DirectExchange("ride.exchange");
     }

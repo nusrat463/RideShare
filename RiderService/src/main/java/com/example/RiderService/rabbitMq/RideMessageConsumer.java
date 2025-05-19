@@ -35,7 +35,7 @@ public class RideMessageConsumer {
     private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private WebSocketNotifier webSocketNotifier;
 
     private final Map<Long, CompletableFuture<Boolean>> riderResponseMap = new ConcurrentHashMap<>();
 
@@ -105,22 +105,20 @@ public class RideMessageConsumer {
 
 
     private boolean notifyRider(String riderId, Ride ride) {
-        String notificationServiceUrl = "http://localhost:8085/api/notify-rider"; // example URL
-
         RiderNotificationRequest request = new RiderNotificationRequest(
                 ride.getId(),
                 ride.getUserId(),
                 ride.getPickupLocation(),
                 ride.getDropoffLocation()
         );
-        return true;
-//        try {
-//            restTemplate.postForEntity(notificationServiceUrl, request, Void.class);
-//            return true;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return false;
-//        }
+
+        try {
+            webSocketNotifier.notifyRider(riderId, request);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private boolean awaitRiderResponse(Long rideId, String riderId) {

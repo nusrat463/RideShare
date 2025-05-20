@@ -18,6 +18,7 @@ public class RabbitMQConfig {
     public static final String RIDE_EXCHANGE = "rideExchange";
     public static final String ROUTING_KEY = "ride.created";
 
+
     @Bean
     public Queue rideQueue() {
         return new Queue(RIDE_QUEUE, false);
@@ -40,6 +41,17 @@ public class RabbitMQConfig {
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
+
+    @Bean
+    public Queue rideAcceptedQueue() {
+        return new Queue("ride.assigned", false);
+    }
+
+    @Bean
+    public Binding dlqBinding() {
+        return BindingBuilder.bind(rideAcceptedQueue()).to(rideExchange()).with("ride.assigned");
+    }
+
 
 
 }

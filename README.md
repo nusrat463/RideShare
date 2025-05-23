@@ -10,14 +10,14 @@ RideShare is a Spring Boot-based backend application follows a monorepo microser
   Allows users to request rides. Publishes ride requests to RabbitMQ.
 
 - **Rider Service**:  
-  Riders periodically publish location updates via RabbitMQ + WebSocket.
-  Riders receive real-time ride assignment notifications via WebSocket.
-  Riders have 15 seconds to respond. On timeout or rejection, retry occurs.
-  If a rider rejects/does not respond, next nearest rider is tried (up to 3 attempts).
+  - Riders periodically publish location updates via RabbitMQ + WebSocket.
+  - Riders receive real-time ride assignment notifications via WebSocket.
+  - Riders have 15 seconds to respond. On timeout or rejection, retry occurs.
+  - If a rider rejects/does not respond, next nearest rider is tried (up to 3 attempts).
 
 - **RabbitMQ**:  
-  Decoupled services communicate via event queues.
-  After 3 failed attempts to assign a ride, request is logged and sent to DLQ.
+  - Decoupled services communicate via event queues.
+  - After 3 failed attempts to assign a ride, request is logged and sent to DLQ.
 
 ---
 
